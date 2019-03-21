@@ -1,4 +1,5 @@
 import tensorflow as tf
+from activate_func import Relu
 
 class Layer:
 
@@ -8,7 +9,7 @@ class Layer:
         self._output = None
 
 
-class MaxPoolLayer:
+class MaxPoolLayer(Layer):
 
     def __init__(self, input, pool_size, stride):
         """
@@ -25,7 +26,7 @@ class MaxPoolLayer:
         return self._output
 
 
-class ConvLayer:
+class ConvLayer(Layer):
 
     def __init__(self, input_data, filters, ksize, strides, bias, padding, layer_name):
         """
@@ -77,7 +78,7 @@ class ConvLayer:
             activation=self.__active_method, bias_regularizer=self.__bias_regularizer, kernel_regularizer=self.__kernel_rgularizer)
         return super._output
 
-class AveragePoolLayer:
+class AveragePoolLayer(Layer):
 
     def __init__(self, intput, pool_size, stride):
         """

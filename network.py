@@ -1,4 +1,5 @@
 from layer import ConvLayer
+from typing import Dict
 
 class Network:
 
@@ -10,9 +11,28 @@ class Network:
         self.input = None
         self.layers = {}
         self.output = None
+        self.__defined_layer = {}
         pass
 
-    def add_conv_layer(self, input_data, filters, ksize, strides, bias, padding, layer_name, active):
+    def __init_defined_layer(self):
+        self.__defined_layer['conv'] = self.__add_conv_layer_by_param
+        self.__defined_layer['maxpool'] = self.__add_maxpool_layer_by_param
+        self.__defined_layer['averagepool'] = self.__add_average_pool_layer_by_param
+
+    def __add_conv_layer_by_param(self, param):
+        filters = param['filters']
+        ksize = param['ksize']
+        stride = param['stride']
+        bias = param['bias']
+        pass
+
+    def __add_maxpool_layer_by_param(self, param):
+        pass
+
+    def __add_average_pool_layer_by_param(self, param):
+        pass
+
+    def add_conv_layer(self, input_data, filters, ksize, strides, bias, padding, active, layer_name=""):
         '''
         Args:
             kisze: list 卷积核大小
@@ -28,4 +48,8 @@ class Network:
         pass
 
     def add_average_pool_layer(self, input, size, stride, padding, layer_name):
+        pass
+
+    def add_layer(self, params: Dict[str, str]):
+        
         pass

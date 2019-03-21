@@ -15,7 +15,7 @@ class Parser:
             sys.exit(1)
         
         # 加载预先定义好的层
-        self.__network = None #type: Network
+        self.__network = Network() #type: Network
         self.__all_layers = {}
         self.__init_defined_layers()
 
@@ -39,14 +39,19 @@ class Parser:
             element_index = [i for i,v in enumerate(element_list) if v == True]
             element_index.append(len(lines))
 
-            params_list = []
+            # print(element_index)
+            # params_list = []
             for index, value in enumerate(element_index):
                 if index == len(element_index) - 1:
                     break
                 param = self.__get_params(lines[value+1 : element_index[index+1]-1])
-                param["type"]=lines[value].replace("[", "").replace("]", "").replace("\n", "")
-                params_list.append(param)
-            print(params_list)
+                param["type"]=lines[value].replace("[", "").replace("]", "").replace("\n", "") # 读取出来每一行最后都是\n需要去掉
+                print(param)
+                self.__network.add_layer(param)
+                # params_list.append(param)
+            
+        
+
 
     def __get_params(self, param_lines: List[str]) -> Dict[str, str]:
         """
@@ -54,9 +59,8 @@ class Parser:
         """
         params = {} # type: Dict[str, str]
         for line in param_lines: # type:str
-            if line != "":
+            if line != "" and line != "\n" and (not line.startswith("#")):
                 param = line.replace("\n", "").split("=")
-                # print(param)
                 params[param[0]] = param[1]
 
         return params
