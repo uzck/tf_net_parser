@@ -3,15 +3,23 @@ from activate_func import Relu
 
 class Layer:
 
-    def __init__(self, layer_name):
-        self._layer_name = layer_name
-        self._input_data = None
-        self._output = None
+    def __init__(self, layer_name: str = ""):
+        self.layer_name = layer_name
+        self.input = None
+        self.output = None
 
+    def get_output(self):
+        return self.output
+    
+    def calculate(self):
+        """
+        子类需要重写的函数：从input到output的过程
+        """
+        pass
 
 class MaxPoolLayer(Layer):
 
-    def __init__(self, input, pool_size, stride):
+    def __init__(self, pool_size, stride, padding):
         """
         Args:
             input: 输入
@@ -20,11 +28,21 @@ class MaxPoolLayer(Layer):
         Returns:
             output: 输出
         """
-        self._output = tf.layers.max_pooling2d(input, pool_size, stride)
+        Layer.__init__(self)
+        self.pool_size = pool_size
+        self.stride = stride
+        self.padding = padding
+        pass
 
-    def get_pool_result(self):
-        return self._output
+    def calculate(self):
+        self.pool()
+        return self.output
 
+    def pool(self):
+        self.output = tf.layers.max_pooling2d(self.input, (self.pool_size, self.pool_size), self.stride, self.padding)
+    
+    def get_output(self):
+        return self.output    
 
 class ConvLayer(Layer):
 
@@ -80,7 +98,7 @@ class ConvLayer(Layer):
 
 class AveragePoolLayer(Layer):
 
-    def __init__(self, intput, pool_size, stride):
+    def __init__(self, pool_size, stride, padding):
         """
         Args:
             input: 输入
@@ -93,3 +111,20 @@ class AveragePoolLayer(Layer):
         
     def get_pool_result(self):
         return self._output
+
+class OutputLayer(Layer):
+    """
+    输出层
+    """
+    def __init__(self, value_type, shape):
+        Layer.__init__(self, "output_layer")
+    
+
+class InputLayer(Layer):
+    """
+    输入层
+    """
+    def __init__(self, input_image, value_type, shape):
+        Layer.__init__(self, "input_layer")
+        self.input = input_image
+        self.output = tf.placeholder(value_type, shape, "input")

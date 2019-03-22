@@ -21,16 +21,15 @@ class NetworkBuilder:
         
     def set_logger(self, logger: Logger):
         self.__logger = logger
-        return self
 
     def set_parser(self, parser):
         self.__parser = parser
-        return self
     
     def set_train_tool(self, train_tool: TrainTool):
         self.__train_tool = train_tool
-        return self
 
     def build(self):
-        return self.__parser.parse_network()
+        self.__network = self.__parser.parse_network()
+        return self.__network
+    
         

@@ -48,7 +48,8 @@ class Parser:
                 param["type"]=lines[value].replace("[", "").replace("]", "").replace("\n", "") # 读取出来每一行最后都是\n需要去掉
                 print(param)
                 self.__network.add_layer(param)
-                # params_list.append(param)
+            
+            return self.__network
             
         
 
