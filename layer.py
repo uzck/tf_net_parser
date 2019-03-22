@@ -46,7 +46,7 @@ class MaxPoolLayer(Layer):
 
 class ConvLayer(Layer):
 
-    def __init__(self, input_data, filters, ksize, strides, bias, padding, layer_name):
+    def __init__(self, filters, ksize, strides, bias, padding, layer_name=""):
         """
         Args:
             input_data: tensor 上一层的输出或原始图像
@@ -57,24 +57,27 @@ class ConvLayer(Layer):
             filters: int 卷积核的个数
             bias: float 偏置
         """
-        super.__init__(layer_name)
-        super._input = input_data
-        super._output = None
+        Layer.__init__(self,layer_name)
         self.__filters = filters
         self.__ksize = ksize
-        self.__bias = tf.Variable(tf.constant(bias, shape=filters), name=layer_name + "_bias")
+        self.__bias = tf.Variable(tf.constant(bias))
         self.__strides = strides
         self.__padding = padding
         self.__active_method = None # 激活函数
         self.__bias_regularizer = None # 偏置的正则项
         self.__kernel_rgularizer = None  # 卷积核的正则项
+        self.__activate_func = {}
+        self.__init_defined_activate_func()
+
+    def __init_defined_activate_func(self):
+        self.__activate_func['relu'] = tf.nn.relu
 
     def set_active_method(self, active_method):
         """
         Args:
             active_method: 激活函数
         """
-        self.__active_method = active_method
+        self.__active_method = self.__activate_func[active_method]
 
     def set_bias_regularizer(self, bias_regularizer):
         """
@@ -90,10 +93,13 @@ class ConvLayer(Layer):
         """
         self.__kernel_rgularizer = kernel_rgularizer
 
-    def get_output(self):
+    def calculate(self):
         self.output = tf.layers.conv2d(
-            super._input, self.__filters, self.__ksize, strides=self.__strides, 
+            self.input, self.__filters, (self.__ksize, self.__ksize), strides=self.__strides, 
             activation=self.__active_method, bias_regularizer=self.__bias_regularizer, kernel_regularizer=self.__kernel_rgularizer)
+        return self.output
+
+    def get_output(self):
         return super._output
 
 class AveragePoolLayer(Layer):
@@ -116,7 +122,7 @@ class OutputLayer(Layer):
     """
     输出层
     """
-    def __init__(self, value_type, shape):
+    def __init__(self):
         Layer.__init__(self, "output_layer")
     
 

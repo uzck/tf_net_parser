@@ -2,6 +2,7 @@ import os
 import numpy as np 
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
+import cv2
 
 def image_to_ndarray(image_path: str) -> np.ndarray:
     """
@@ -28,4 +29,4 @@ def show_image(image: np.ndarray):
     plt.show() 
 
 def save_image(target_path: str, image: np.ndarray):
-    mpimg.imsave(target_path, image)
+    cv2.imwrite(target_path, image)

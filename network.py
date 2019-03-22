@@ -28,7 +28,14 @@ class Network:
         ksize = param['ksize']
         stride = param['stride']
         bias = param['bias']
-        pass
+        padding = param['padding']
+        activate_func = param['activate']
+
+        conv_layer = ConvLayer(int(filters), int(ksize), int(stride), int(bias), padding)
+        if activate_func != None and activate_func != "":
+            conv_layer.set_active_method(activate_func)
+        
+        self.layers.append(conv_layer)
 
     def __add_maxpool_layer_by_param(self, param):
         size = param['size']
@@ -49,10 +56,11 @@ class Network:
             padding: string 填充方式，可选值VALID/SAME
             name: string 该层的名字
         '''
-        conv_layer = ConvLayer(input_data, filters, ksize, strides, bias, padding, layer_name)
-        conv_layer.set_active_method(active) # 添加激活函数
-        self.layers_save[layer_name] = conv_layer # 添加到网络中
-        self.layers.append(conv_layer)
+        pass
+        # conv_layer = ConvLayer(input_data, filters, ksize, strides, bias, padding, layer_name)
+        # conv_layer.set_active_method(active) # 添加激活函数
+        # self.layers_save[layer_name] = conv_layer # 添加到网络中
+        # self.layers.append(conv_layer)
         
     def add_maxpool_layer(self, input, size, stride, padding, layer_name):
         pass
@@ -77,10 +85,10 @@ class Network:
         """
         for index, layer in enumerate(self.layers): #type: int, Layer
             if index != 0:
-                # print(index)
+                print(index)
                 layer.input = self.layers[index-1].output
-                # print(layer.input)
+                print(layer.input)
                 layer.output = layer.calculate()
-                # print(layer.output)
+                print(layer.output)
             
         self.output = self.layers[len(self.layers)-1].input 
