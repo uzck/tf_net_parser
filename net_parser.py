@@ -36,15 +36,17 @@ class Parser:
             
             # 读取含[]的行
             element_list = list(map(lambda line: line[0] == '[', lines)) # type: List[bool]
+            print(element_list)
             element_index = [i for i,v in enumerate(element_list) if v == True]
-            element_index.append(len(lines))
-
-            # print(element_index)
+            # element_index.append(len(lines))
             # params_list = []
+            print('element_index: ', len(element_index))
             for index, value in enumerate(element_index):
+                print(index)
                 if index == len(element_index) - 1:
-                    break
-                param = self.__get_params(lines[value+1 : element_index[index+1]-1])
+                    param = self.__get_params(lines[value+1:])
+                else:
+                    param = self.__get_params(lines[value+1 : element_index[index+1]-1])
                 param["type"]=lines[value].replace("[", "").replace("]", "").replace("\n", "") # 读取出来每一行最后都是\n需要去掉
                 print(param)
                 self.__network.add_layer(param)

@@ -1,6 +1,9 @@
 import sys
 sys.path.append("../")
-from utils import read_image
+import numpy as np
+from utils import read_image, save_image, padding
 
 if __name__ == '__main__':
-    read_image('../data/heart.jpg')
+    pad_image = padding(read_image('../data/heart.jpg'), 3)
+    print(np.shape(pad_image))
+    save_image('../data/heart2.jpg', pad_image)

@@ -22,6 +22,16 @@ class Network:
         self.__defined_layer['conv'] = self.__add_conv_layer_by_param
         self.__defined_layer['maxpool'] = self.__add_maxpool_layer_by_param
         self.__defined_layer['averagepool'] = self.__add_average_pool_layer_by_param
+        self.__defined_layer['build-block'] = self.__add_build_block
+
+    def add_defined_layers(self, layer_name, layer_func):
+        """
+        扩展自定义层
+        Args:
+            layer_name: 字典里的key
+            layer_func: 添加时初始化layer参数的函数
+        """
+        pass
 
     def __add_conv_layer_by_param(self, param: Dict[str, str]):
         filters = param['filters']
@@ -30,11 +40,13 @@ class Network:
         bias = param['bias']
         padding = param['padding']
         activate_func = param['activate']
+        useFixPad = param['use-fix-padding']
 
         conv_layer = ConvLayer(int(filters), int(ksize), int(stride), int(bias), padding)
         if activate_func != None and activate_func != "":
             conv_layer.set_active_method(activate_func)
-        
+        if useFixPad != None and useFixPad == 'true':
+            conv_layer.use_fix_pad()
         self.layers.append(conv_layer)
 
     def __add_maxpool_layer_by_param(self, param):
@@ -44,6 +56,17 @@ class Network:
 
         maxpool_layer = MaxPoolLayer(int(size), int(stride), padding)
         self.layers.append(maxpool_layer)
+
+    def __add_build_block(self, param: Dict):
+        use_fix_pad = param.get('use-fix-padding')
+        sample = param.get('sample')
+        channels = param['channels']
+        build_block = BuildingBlock(channels)
+        if use_fix_pad == 'true':
+            build_block.use_fix_pad()
+        if sample == 'false':
+            build_block.not_sample()
+        self.layers.append(build_block)
 
     def __add_average_pool_layer_by_param(self, param):
         pass
@@ -57,16 +80,15 @@ class Network:
             name: string 该层的名字
         '''
         pass
-        # conv_layer = ConvLayer(input_data, filters, ksize, strides, bias, padding, layer_name)
-        # conv_layer.set_active_method(active) # 添加激活函数
-        # self.layers_save[layer_name] = conv_layer # 添加到网络中
-        # self.layers.append(conv_layer)
         
     def add_maxpool_layer(self, input, size, stride, padding, layer_name):
         pass
 
     def add_average_pool_layer(self, input, size, stride, padding, layer_name):
         pass
+
+    def add_layers_at_position(self, layer, index="-1"):
+        self.layers.insert(index, layer)
 
     def add_layer(self, params: Dict[str, str]):
         self.__defined_layer[params['type']](params)
@@ -85,10 +107,10 @@ class Network:
         """
         for index, layer in enumerate(self.layers): #type: int, Layer
             if index != 0:
-                print(index)
+                print('index: ', index)
                 layer.input = self.layers[index-1].output
-                print(layer.input)
+                print('input: ', layer.input)
                 layer.output = layer.calculate()
-                print(layer.output)
+                print('output: ', layer.output)
             
         self.output = self.layers[len(self.layers)-1].input 
