@@ -27,10 +27,11 @@ def main():
     
     sess.run(tf.global_variables_initializer())
     build_block_image = sess.run(network.output, feed_dict={network.input: image})
-    kernel_size = np.shape(build_block_image)[3]
-    for i in range(kernel_size):
-        if i < kernel_size - 1:
-            save_image('../data/res_image' + str(i) + '.jpg', build_block_image[0][:,:,i:i+1])
+    print(np.shape(build_block_image))
+    # kernel_size = np.shape(build_block_image)[3]
+    # for i in range(kernel_size):
+    #     if i < kernel_size - 1:
+    #         save_image('../data/res_image' + str(i) + '.jpg', build_block_image[0][:,:,i:i+1])
     
 
 if __name__ == '__main__':

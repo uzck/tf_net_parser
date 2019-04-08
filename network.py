@@ -23,6 +23,7 @@ class Network:
         self.__defined_layer['maxpool'] = self.__add_maxpool_layer_by_param
         self.__defined_layer['averagepool'] = self.__add_average_pool_layer_by_param
         self.__defined_layer['build-block'] = self.__add_build_block
+        self.__defined_layer['bottle-neck'] = self.__add_bottle_neck
 
     def add_defined_layers(self, layer_name, layer_func):
         """
@@ -64,9 +65,22 @@ class Network:
         build_block = BuildingBlock(channels)
         if use_fix_pad == 'true':
             build_block.use_fix_pad()
-        if sample == 'false':
-            build_block.not_sample()
+        if sample == 'true':
+            build_block.sample()
         self.layers.append(build_block)
+
+    def __add_bottle_neck(self, param: Dict):
+        use_fix_pad = param.get('use-fix-padding')
+        sample = param.get('sample')
+        input_channel = param['input-channel']
+        output_channel = param['output-channel']
+        bottle_neck = BottleNeckV2(input_channel, output_channel)
+
+        if use_fix_pad == 'true':
+            bottle_neck.use_fix_pad()
+        if sample == 'true':
+            bottle_neck.sample()
+        self.layers.append(bottle_neck)
 
     def __add_average_pool_layer_by_param(self, param):
         pass

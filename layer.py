@@ -169,13 +169,55 @@ class BottleNeckV2(Layer):
     """
     bottle-neck
     """
-    def __init__(self):
-        pass
+    def __init__(self, input_channel, output_channel):
+        self.__input_channel = int(input_channel)
+        self.__output_channel = int(output_channel)
+        self.__use_fix_pad = False
+        self.__sample = False
+
+    def use_fix_pad(self):
+        self.__use_fix_pad = True
+
+    def sample(self):
+        self.__sample = True
 
     def calculate(self):
-        # 使用identity map将输入和输出相加后通过activate function
-        self.output = tf.nn.relu(self.input + self.output)
-        pass
+        if (type(self.input) == tf.Tensor):
+            # print('dimension: ', self.input.get_shape().as_list())
+            self.__weight_dimension = self.input.get_shape().as_list()[-1] # 输入的维度
+            print('输入的维度: ', self.__weight_dimension)
+            input_copy = self.input
+            print('input copy的维度: ', input_copy.get_shape().as_list())
+            # 输入的channel数和block的channel数不一致时
+            # input.channel = block.channel
+            # if self.__weight_dimension != self.__input_channel:
+            #     print('减少input的channel')
+            #     diff = self.__weight_dimension - self.__input_channel
+            #     input_copy = tf.pad(self.input, [[0,0], [0,0], [0,0], [diff // 2, diff - diff // 2]])
+            #     self.use_fix_pad()
+            print('input_copy: ', input_copy.get_shape().as_list())
+            stride = 2 if self.__sample == True else 1
+            print('stride: ', stride)
+            block1 = tf.layers.conv2d(input_copy, self.__input_channel, 1, stride, padding='VALID')
+            bn_block1 = tf.layers.batch_normalization(block1)
+            relu_block1 = tf.nn.relu(bn_block1)
+            print('relu1_block1: ', relu_block1.get_shape().as_list())
+            fix_pad_input2 = fix_pad_tensor(relu_block1, 3)
+            block2 = tf.layers.conv2d(fix_pad_input2, self.__input_channel, 3, 1, padding='VALID')
+            bn_block2 = tf.layers.batch_normalization(block2)
+            relu_block2 = tf.nn.relu(bn_block2)
+            print('relu1_block2: ', relu_block2.get_shape().as_list())
+            block3 = tf.layers.conv2d(relu_block2, self.__output_channel, 1, 1)
+            bn_block3 = tf.layers.batch_normalization(block3)
+            relu_block3 = tf.nn.relu(bn_block3)
+            input_copy = tf.layers.conv2d(input_copy, self.__weight_dimension, 1, 2) if self.__sample else input_copy
+            if self.__weight_dimension != self.__output_channel:
+                print('增大input的channel')
+                diff = self.__output_channel - self.__weight_dimension
+                input_copy = tf.pad(input_copy, [[0,0], [0,0], [0,0], [diff // 2, diff - diff // 2]])
+            print(input_copy.get_shape().as_list(), ' , ', relu_block3.get_shape().as_list())
+            self.output = tf.nn.relu(input_copy + relu_block3)
+            return self.output
 
 class BuildingBlock(Layer):
     """
@@ -184,13 +226,13 @@ class BuildingBlock(Layer):
     def __init__(self, channels):
         self.__channels = int(channels)
         self.__use_fix_pad = False
-        self.__sample = True
+        self.__sample = False
 
     def use_fix_pad(self):
         self.__use_fix_pad = True
 
-    def not_sample(self):
-        self.__sample = False
+    def sample(self):
+        self.__sample = True
 
     def calculate(self):
         if (type(self.input) == tf.Tensor):
@@ -199,19 +241,19 @@ class BuildingBlock(Layer):
             input_copy = self.input
             # 输入的channel数和block的channel数不一致时
             # input.channel = block.channel
-            make_stride_2 = False
             if self.__weight_dimension != self.__channels:
                 print('调整input的channel')
                 diff = self.__channels - self.__weight_dimension
                 input_copy = tf.pad(self.input, [[0,0], [0,0], [0,0], [diff // 2, diff - diff // 2]])
                 self.use_fix_pad()
-            fix_pad_input1 = fix_pad_tensor(self.input, 3) if self.__use_fix_pad else self.input
+            fix_pad_input1 = fix_pad_tensor(input_copy, 3)
             stride = 2 if self.__sample == True else 1
             print('stride: ', stride)
             block1 = tf.layers.conv2d(fix_pad_input1, self.__channels, 3, stride, padding='VALID')
             bn_block1 = tf.layers.batch_normalization(block1)
             relu_block1 = tf.nn.relu(bn_block1)
-            fix_pad_input2 = fix_pad_tensor(relu_block1, 3) if self.__use_fix_pad else relu_block1
+
+            fix_pad_input2 = fix_pad_tensor(relu_block1, 3)
             block2 = tf.layers.conv2d(fix_pad_input2, self.__channels, 3, 1, padding='VALID')
             bn_block2 = tf.layers.batch_normalization(block2)
             relu_block2 = tf.nn.relu(bn_block2)
