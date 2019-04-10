@@ -1,9 +1,15 @@
 import tensorflow as tf
+from typing import Dict
+from network import Network
 
 class TrainTool:
 
-    def __init__(self):
-        pass
+    def __init__(self, network: Network):
+        self.__network = network # type: Network
+        self.__datasets = None
+
+    def set_datasets(self, dataset):
+        self.__datasets = dataset
 
     def load_weights(self):
         """
@@ -22,5 +28,17 @@ class TrainTool:
     def __load_xml(self, xml_path: str):
         pass
 
-    def train(self):
-        pass
+    def train(self, sess: tf.Session, target: tf.placeholder, feed_dict={}):
+        """
+        扩展函数
+        """
+        self.__network.optimizer.run(feed_dict=feed_dict, session=sess)
+    
+    def set_optimizer(self, optimizer):
+        self.__network.set_optimizer(optimizer)
+
+    def print_accuracy(self, sess, feed_dict):
+        print('accuracy: ', self.__network.accuracy.eval(session=sess, feed_dict=feed_dict))
+
+    def print_test_accuracy(self, sess, feed_dict):
+        print('test accuracy: ', self.__network.accuracy.eval(session=sess, feed_dict=feed_dict))

@@ -96,6 +96,7 @@ class ConvLayer(Layer):
         self.__bias_regularizer = None # 偏置的正则项
         self.__kernel_rgularizer = None  # 卷积核的正则项
         self.__activate_func = {}
+        self.__use_fix_pad = False
         self.__init_defined_activate_func()
 
     def __init_defined_activate_func(self):
@@ -159,10 +160,11 @@ class DenseLayer(Layer):
 
     def __init__(self, unit):
         self.__unit = unit
-        pass
+        self.__activation = 'relu'
+        self.__points = 4 * 4 * 64
 
     def calculate(self):
-        self.output = tf.layers.dense(self.input, self.__unit)
+        self.output = tf.layers.dense(tf.reshape(self.input, [100, self.__points]), self.__unit, activation=tf.nn.relu)
         return self.output
 
 class BottleNeckV2(Layer):
@@ -188,13 +190,6 @@ class BottleNeckV2(Layer):
             print('输入的维度: ', self.__weight_dimension)
             input_copy = self.input
             print('input copy的维度: ', input_copy.get_shape().as_list())
-            # 输入的channel数和block的channel数不一致时
-            # input.channel = block.channel
-            # if self.__weight_dimension != self.__input_channel:
-            #     print('减少input的channel')
-            #     diff = self.__weight_dimension - self.__input_channel
-            #     input_copy = tf.pad(self.input, [[0,0], [0,0], [0,0], [diff // 2, diff - diff // 2]])
-            #     self.use_fix_pad()
             print('input_copy: ', input_copy.get_shape().as_list())
             stride = 2 if self.__sample == True else 1
             print('stride: ', stride)
@@ -261,7 +256,17 @@ class BuildingBlock(Layer):
             print(input_copy.get_shape().as_list(), ' , ', relu_block2.get_shape().as_list())
             self.output = tf.nn.relu(input_copy + relu_block2)
             return self.output
-        
+
+class SoftMax(Layer):
+    """
+    """
+    def __init__(self, weight_x, weight_y):
+        self.__weight_x = int(weight_x)
+        self.__weight_y = int(weight_y)
+    
+    def calculate(self):
+        self.output = tf.nn.softmax(tf.matmul(self.input, tf.Variable(tf.truncated_normal([self.__weight_x, self.__weight_y]))))
+        return self.output
 
 class OutputLayer(Layer):
     """
@@ -269,13 +274,16 @@ class OutputLayer(Layer):
     """
     def __init__(self):
         Layer.__init__(self, "output_layer")
-    
+
 
 class InputLayer(Layer):
     """
     输入层
     """
-    def __init__(self, input_image, value_type, shape):
+    def __init__(self, value_type, shape):
         Layer.__init__(self, "input_layer")
-        self.input = input_image
+        # self.input = input_image
         self.output = tf.placeholder(value_type, shape, "input")
+    
+    def calculate(self):
+        return self.output

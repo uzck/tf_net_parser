@@ -3,6 +3,9 @@ class TestTool:
     def __init__(self):
         pass
 
+    def eval(self, target):
+        pass
+
     def load_model(self, model_path: str):
         """
         加载模型

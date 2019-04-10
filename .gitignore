@@ -111,3 +111,6 @@ data/*.jpg
 
 # 权重文件
 weights/
+
+# 数据集
+datasets/
