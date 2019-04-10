@@ -1,3 +1,5 @@
+import tensorflow as tf
+
 class TrainTool:
 
     def __init__(self):
@@ -18,4 +20,7 @@ class TrainTool:
         pass
 
     def __load_xml(self, xml_path: str):
+        pass
+
+    def train(self):
         pass
