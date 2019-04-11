@@ -9,6 +9,7 @@ class Network:
         '''
         网络分为四部分：输入，中间层，输出，loss函数
         '''
+        # self.batch_size = batch_size
         self.loss = CrossEntropy
         self.loss_value = None
         self.input = None
@@ -164,4 +165,5 @@ class Network:
                 layer.output = layer.calculate()
                 print('output: ', layer.output)
             
-        self.output = self.layers[len(self.layers)-1].input 
+        self.output = self.layers[len(self.layers)-1].input
+        tf.add_to_collection("predict_result", self.output)

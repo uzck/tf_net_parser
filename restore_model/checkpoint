@@ -1,0 +1,4 @@
+model_checkpoint_path: "f:/tf_net_parser/save_model/model-300"
+all_model_checkpoint_paths: "f:/tf_net_parser/save_model/model-100"
+all_model_checkpoint_paths: "f:/tf_net_parser/save_model/model-200"
+all_model_checkpoint_paths: "f:/tf_net_parser/save_model/model-300"

@@ -1,12 +1,14 @@
 import tensorflow as tf
 from typing import Dict
 from network import Network
+from utils import save_model, save_to_npz, save_to_npy
 
 class TrainTool:
 
-    def __init__(self, network: Network):
-        self.__network = network # type: Network
-        self.__datasets = None
+    def __init__(self):
+        self.__network = None # type: Network
+        self.__saver = None
+        # self.__datasets = None
 
     def set_datasets(self, dataset):
         self.__datasets = dataset
@@ -25,6 +27,11 @@ class TrainTool:
         """
         pass
 
+    def save_model(self, file_path: str, sess: tf.Session, gloabl_step=100, max_model_count=5, keep_checkpoint_every_n_hours=0.5, write_meta_graph=True):
+        if self.__saver == None:
+            self.__saver = tf.train.Saver(max_to_keep=max_model_count, keep_checkpoint_every_n_hours=keep_checkpoint_every_n_hours) # type: tf.train.Saver
+        self.__saver.save(sess, file_path, global_step=gloabl_step, write_meta_graph=write_meta_graph)
+
     def __load_xml(self, xml_path: str):
         pass
 
@@ -32,7 +39,11 @@ class TrainTool:
         """
         扩展函数
         """
-        self.__network.optimizer.run(feed_dict=feed_dict, session=sess)
+        if self.__network != None:
+            self.__network.optimizer.run(feed_dict=feed_dict, session=sess)
+        
+    def bind_network(self, network: Network):
+        self.__network = network
     
     def set_optimizer(self, optimizer):
         self.__network.set_optimizer(optimizer)

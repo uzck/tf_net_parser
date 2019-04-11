@@ -28,6 +28,10 @@ class NetworkBuilder:
     def set_train_tool(self, train_tool: TrainTool):
         self.__train_tool = train_tool
 
+    def set_batch_size(self, batch_size):
+        self.__batch_size = batch_size
+        return self
+
     def build(self):
         self.__network = self.__parser.parse_network()
         return self.__network

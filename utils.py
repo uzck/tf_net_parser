@@ -4,6 +4,7 @@ import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import cv2
 import tensorflow as tf
+from PIL import Image
 
 def image_to_ndarray(image_path: str) -> np.ndarray:
     """
@@ -31,6 +32,9 @@ def show_image(image: np.ndarray):
 
 def save_image(target_path: str, image: np.ndarray):
     cv2.imwrite(target_path, image)
+    # image = Image.fromarray(image * 255)
+    # image = image.convert('RGB')
+    # image.save(target_path)
 
 def padding(origin: np.ndarray, padding_size, value=0):
     """
@@ -53,14 +57,13 @@ def fix_pad_tensor(inputs, kernel_size, data_format='channels_last'):
                                     [pad_beg, pad_end], [0, 0]])
     return padded_inputs
 
-def load_graph(file_path: str, sess: tf.Session):
+def restore_graph(file_path: str, sess: tf.Session):
     """
     加载图模型
     """
-    saver = tf.train.import_meta_graph(file_path)
-    return saver.restore(sess, file_path)
-
-def save_model(file_path: str, sess: tf.Session, gloabl_step=100, max_model_count=5, keep_checkpoint_every_n_hours=0.5, write_meta_graph=False, ):
+    saver = tf.train.Saver(max_to_keep=5)
+    return saver.restore(sess, tf.train.latest_checkpoint('../save_model/'))
+def save_model(file_path: str, sess: tf.Session, gloabl_step=100, max_model_count=5, keep_checkpoint_every_n_hours=0.5, write_meta_graph=False):
     """
     存储训练模型到指定路径
     """
@@ -82,3 +85,9 @@ def save_to_npy(file_path:str, target):
 
 def save_to_npz(file_path: str, target):
     np.savez(file_path, target)
+
+def transfer_graph_to_network(graph):
+    """
+    把saver.restore重建的图解析成Network类
+    """
+    pass

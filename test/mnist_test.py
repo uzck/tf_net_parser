@@ -21,15 +21,17 @@ def main():
     network.connect_each_layer()
     network.set_accuracy()
     network.init_optimizer()
-    train_tool = TrainTool(network)
+    train_tool = TrainTool()
+    train_tool.bind_network(network)
     sess = tf.Session()
     sess.run(tf.initialize_all_variables())
-    for i in range(3000):
+    for i in range(300):
         batch = mnist.train.next_batch(100)
-        feed_dict = {network.input: np.reshape(batch[0], [100, 28, 28, 1]), network.labels: batch[1]}
+        feed_dict = {network.input: np.reshape(batch[0], [-1, 28, 28, 1]), network.labels: batch[1]}
         train_tool.train(sess, network.output, feed_dict=feed_dict)
-        if i % 100 == 0:
+        if (i+1) % 100 == 0:
             train_tool.print_accuracy(sess, feed_dict)
+            train_tool.save_model('f:/tf_net_parser/save_model/model', sess, gloabl_step=(i+1))
 
     batch_test = mnist.test.next_batch(100)
     feed_dict = {network.input: np.reshape(batch_test[0], [100, 28, 28, 1]), network.labels: batch_test[1]}

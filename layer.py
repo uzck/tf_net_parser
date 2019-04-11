@@ -161,10 +161,14 @@ class DenseLayer(Layer):
     def __init__(self, unit):
         self.__unit = unit
         self.__activation = 'relu'
-        self.__points = 4 * 4 * 64
+        self.__points = None
 
     def calculate(self):
-        self.output = tf.layers.dense(tf.reshape(self.input, [100, self.__points]), self.__unit, activation=tf.nn.relu)
+        input_shape = self.input.get_shape().as_list()
+        # batch_size = input_shape[0]
+        self.__points = input_shape[1] * input_shape[2] * input_shape[3]
+        # print('batch_size: ', batch_size, ' points: ', self.__points)
+        self.output = tf.layers.dense(tf.reshape(self.input, [-1, self.__points]), self.__unit, activation=tf.nn.relu)
         return self.output
 
 class BottleNeckV2(Layer):
@@ -283,7 +287,7 @@ class InputLayer(Layer):
     def __init__(self, value_type, shape):
         Layer.__init__(self, "input_layer")
         # self.input = input_image
-        self.output = tf.placeholder(value_type, shape, "input")
+        self.output = tf.placeholder(value_type, shape, name="input")
     
     def calculate(self):
         return self.output
