@@ -114,3 +114,7 @@ weights/
 
 # 数据集
 datasets/
+
+# 模型文件夹
+save_model/
+pb_folder/

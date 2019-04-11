@@ -166,4 +166,5 @@ class Network:
                 print('output: ', layer.output)
             
         self.output = self.layers[len(self.layers)-1].input
-        tf.add_to_collection("predict_result", self.output)
+        tf.identity(self.output, 'predict-result')
+        # tf.add_to_collection("predict_result", self.output)

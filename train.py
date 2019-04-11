@@ -27,7 +27,20 @@ class TrainTool:
         """
         pass
 
-    def save_model(self, file_path: str, sess: tf.Session, gloabl_step=100, max_model_count=5, keep_checkpoint_every_n_hours=0.5, write_meta_graph=True):
+    def save_model_to_pb_file(self, sess, save_path, input_data, output):
+        """
+        存储模型为pb文件
+        """
+        tf.saved_model.simple_save(sess, save_path, input_data, output)
+    
+    def load_graph_from_pb(self, sess, tags, save_path):
+        """
+        从pb文件里读取模型
+        """
+        tf.saved_model.loader.load(sess, tags, save_path)
+        return tf.get_default_graph()
+
+    def save_ckpt_model(self, file_path: str, sess: tf.Session, gloabl_step=100, max_model_count=5, keep_checkpoint_every_n_hours=0.5, write_meta_graph=True):
         if self.__saver == None:
             self.__saver = tf.train.Saver(max_to_keep=max_model_count, keep_checkpoint_every_n_hours=keep_checkpoint_every_n_hours) # type: tf.train.Saver
         self.__saver.save(sess, file_path, global_step=gloabl_step, write_meta_graph=write_meta_graph)

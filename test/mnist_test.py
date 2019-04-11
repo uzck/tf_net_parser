@@ -31,7 +31,8 @@ def main():
         train_tool.train(sess, network.output, feed_dict=feed_dict)
         if (i+1) % 100 == 0:
             train_tool.print_accuracy(sess, feed_dict)
-            train_tool.save_model('f:/tf_net_parser/save_model/model', sess, gloabl_step=(i+1))
+            train_tool.save_model_to_pb_file(sess, '../pb/alexnet-' + str(i+1) + '/' , input_data={'input': network.input}, output={'predict-result': network.output})
+            # train_tool.save_ckpt_model('f:/tf_net_parser/save_model/model', sess, gloabl_step=(i+1))
 
     batch_test = mnist.test.next_batch(100)
     feed_dict = {network.input: np.reshape(batch_test[0], [100, 28, 28, 1]), network.labels: batch_test[1]}

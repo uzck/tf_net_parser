@@ -91,3 +91,6 @@ def transfer_graph_to_network(graph):
     把saver.restore重建的图解析成Network类
     """
     pass
+
+def trans_ckpt_to_pb(ckpt_dir_path: str, save_path: str):
+    pass
